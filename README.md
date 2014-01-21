@@ -1,0 +1,1 @@
+Simple repo to keep my emacs config in sync between multiple boxes
