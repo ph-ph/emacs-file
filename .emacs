@@ -129,6 +129,9 @@
 ;; ESS - to work with R
 (require 'ess-site)
 
+;; Magit - better git
+(require 'magit)
+
 ;; Configuration for multiple cursors
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
