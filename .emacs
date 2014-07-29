@@ -140,6 +140,13 @@
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
+;; Configure stupid Haskell
+(setq haskell-mode-hook 'turn-on-haskell-indentation)
+(setq haskell-program-name "ghci")
+
+;; Configure column marker to be displayed in js mode
+(require 'column-marker)
+(add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 80)))
 
 ;; Set font size to 14pt
 (set-face-attribute 'default nil :height 140)
