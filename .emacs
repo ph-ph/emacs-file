@@ -11,6 +11,7 @@
 (global-set-key [f5] 'revert-buffer)
 (global-set-key (kbd "C-x C-b") 'buffer-menu)
 (global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "M-r") 'rgrep)
 
 ; Move all backup files to one folder
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
@@ -129,9 +130,6 @@
 ;; ESS - to work with R
 (require 'ess-site)
 
-;; Magit - better git
-(require 'magit)
-
 ;; Configuration for multiple cursors
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -148,8 +146,22 @@
 (require 'column-marker)
 (add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 80)))
 
+;; Pymacs craziness
+(autoload 'pymacs-apply "pymacs")
+(autoload 'pymacs-call "pymacs")
+(autoload 'pymacs-eval "pymacs" nil t)
+(autoload 'pymacs-exec "pymacs" nil t)
+(autoload 'pymacs-load "pymacs" nil t)
+(autoload 'pymacs-autoload "pymacs")
+;;(eval-after-load "pymacs"
+;;  '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
+
+;; Install ropemacs
+(require 'pymacs)
+(pymacs-load "ropemacs" "rope-")
+
 ;; Set font size to 14pt
-(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default nil :height 160)
 ;; Display column in the status bar
 (column-number-mode)
 ;; Set window margins to 0
@@ -163,11 +175,78 @@
  '(column-number-mode t)
  '(custom-enabled-themes (quote (tango-dark)))
  '(ido-enable-flex-matching t)
+ '(python-check-command "pylint  -f text")
  '(show-paren-mode t)
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(web-mode-code-indent-offset 4)
+ '(web-mode-markup-indent-offset 4))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;; Magit - better git
+(require 'magit)
+;; Jinja2 mode
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("/vamo/templates/" . web-mode))
+(setq web-mode-engines-alist '(("jinja2" . "\\.html\\'")) )
+
+(defun my-python-check (command)
+  "Check a Python file (default current buffer's file).
+Runs COMMAND, a shell command, as if by `compile'.
+See `python-check-command' for the default."
+  (interactive
+   (list (read-string "Check command: "
+                      (or python-check-custom-command
+                          (concat python-check-command " "
+                                  (shell-quote-argument
+                                   (or
+                                    (let ((name (buffer-file-name)))
+                                      (and name
+                                           (file-name-nondirectory name)))
+                                    "")))))))
+  ;; (setq python-check-custom-command command)
+  (save-some-buffers (not compilation-ask-about-save) nil)
+  (let ((process-environment (python-shell-calculate-process-environment))
+        (exec-path (python-shell-calculate-exec-path)))
+    (compilation-start command nil
+                       (lambda (_modename)
+                         (format python-check-buffer-name command)))))
+
+(add-hook 'python-mode-hook '(lambda () 
+			    (local-set-key "\C-c\C-v" 'my-python-check)))
+
+;; Markdown mode - enable by default on vamo docs
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("/vamo/docs/" . markdown-mode))
+
+;; Undo tree mode - undo tree visualization
+(require 'undo-tree)
+(global-undo-tree-mode)
+
+;; Use iPython as default Python interpreter
+(when (executable-find "ipython")
+  (setq
+   python-shell-interpreter "ipython"
+   python-shell-interpreter-args ""
+   python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+   python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+   python-shell-completion-setup-code
+   "from IPython.core.completerlib import module_completion"
+   python-shell-completion-module-string-code
+   "';'.join(module_completion('''%s'''))\n"
+   python-shell-completion-string-code
+   "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+;; (require 'ipython)
+
+(defun run-vamo-ipython ()
+  (interactive)
+  (let (old-buffer-name python-shell-buffer-name)
+    (setq python-shell-buffer-name "VamoPython")
+    (run-python "bash -c \"source ~/.bash_profile && workon vamo && ipython\"" nil t)
+    (setq python-shell-buffer-name old-buffer-name))
+  )
