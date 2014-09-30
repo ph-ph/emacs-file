@@ -176,6 +176,7 @@
  '(custom-enabled-themes (quote (tango-dark)))
  '(ido-enable-flex-matching t)
  '(python-check-command "pylint  -f text")
+ '(scss-compile-at-save nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(web-mode-code-indent-offset 4)
@@ -189,6 +190,8 @@
 
 ;; Magit - better git
 (require 'magit)
+(global-set-key (kbd "C-x m") 'magit-status)
+
 ;; Jinja2 mode
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("/vamo/templates/" . web-mode))
@@ -216,7 +219,7 @@ See `python-check-command' for the default."
                        (lambda (_modename)
                          (format python-check-buffer-name command)))))
 
-(add-hook 'python-mode-hook '(lambda () 
+(add-hook 'python-mode-hook '(lambda ()
 			    (local-set-key "\C-c\C-v" 'my-python-check)))
 
 ;; Markdown mode - enable by default on vamo docs
@@ -241,12 +244,16 @@ See `python-check-command' for the default."
    "';'.join(module_completion('''%s'''))\n"
    python-shell-completion-string-code
    "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
-;; (require 'ipython)
 
+;; Custom command to run ipython with vamo venv
 (defun run-vamo-ipython ()
   (interactive)
   (let (old-buffer-name python-shell-buffer-name)
     (setq python-shell-buffer-name "VamoPython")
-    (run-python "bash -c \"source ~/.bash_profile && workon vamo && ipython\"" nil t)
+    (run-python "bash -c \"source ~/.bash_profile && workon vamo && cd /Users/dzmitry/src/vamo && foreman run ipython --profile vamo\"" nil t)
     (setq python-shell-buffer-name old-buffer-name))
   )
+(global-set-key (kbd "C-x r p") 'run-vamo-ipython)
+
+;; mode for editing scss files
+(require 'scss-mode)
