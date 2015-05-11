@@ -42,6 +42,9 @@
 (add-to-list 'load-path "/Applications/Emacs.app/Contents/Resources/lisp/progmodes/")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/other/")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/ess/lisp/")
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize))
+
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/scala-emacs")
 ;; (require 'scala-mode-auto)
 
@@ -78,7 +81,7 @@
 (require 'js-comint)
 ;; Use node as our repl
 (setq inferior-js-program-command "node")
- 
+
 (setq inferior-js-mode-hook
       (lambda ()
         ;; We like nice colors
@@ -92,7 +95,7 @@
 )
 )))
 
-(add-hook 'js-mode-hook '(lambda () 
+(add-hook 'js-mode-hook '(lambda ()
 			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
 			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
 			    (local-set-key "\C-cc" 'js-send-buffer)
@@ -146,7 +149,9 @@
 (require 'column-marker)
 (add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 80)))
 
+
 ;; Pymacs craziness
+;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python2.7")
 (autoload 'pymacs-apply "pymacs")
 (autoload 'pymacs-call "pymacs")
 (autoload 'pymacs-eval "pymacs" nil t)
@@ -174,8 +179,10 @@
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
  '(custom-enabled-themes (quote (tango-dark)))
+ '(git-commit-fill-column 255)
  '(ido-enable-flex-matching t)
- '(python-check-command "pylint  -f text")
+ '(python-check-command
+   "pylint  --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\"")
  '(scss-compile-at-save nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
@@ -186,7 +193,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(column-marker-1 ((t (:background "disabledControlTextColor")))))
 
 ;; Magit - better git
 (require 'magit)
@@ -195,6 +202,7 @@
 ;; Jinja2 mode
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("/vamo/templates/" . web-mode))
+(add-to-list 'auto-mode-alist '("/vamo/blueprints/content_editor/templates/" . web-mode))
 (setq web-mode-engines-alist '(("jinja2" . "\\.html\\'")) )
 
 (defun my-python-check (command)
@@ -217,7 +225,7 @@ See `python-check-command' for the default."
         (exec-path (python-shell-calculate-exec-path)))
     (compilation-start command nil
                        (lambda (_modename)
-                         (format python-check-buffer-name command)))))
+                         "*Python check*"))))
 
 (add-hook 'python-mode-hook '(lambda ()
 			    (local-set-key "\C-c\C-v" 'my-python-check)))
@@ -249,7 +257,7 @@ See `python-check-command' for the default."
 (defun run-vamo-ipython ()
   (interactive)
   (let (old-buffer-name python-shell-buffer-name)
-    (setq python-shell-buffer-name "VamoPython")
+    (setq python-shell-buffer-name "Python")
     (run-python "bash -c \"source ~/.bash_profile && workon vamo && cd /Users/dzmitry/src/vamo && foreman run ipython --profile vamo\"" nil t)
     (setq python-shell-buffer-name old-buffer-name))
   )
@@ -257,3 +265,29 @@ See `python-check-command' for the default."
 
 ;; mode for editing scss files
 (require 'scss-mode)
+
+;; delete trailing whitespace before saving
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; highlight lines with python breakpoints
+(defun annotate-pdb ()
+  (interactive)
+  (highlight-lines-matching-regexp "import pdb")
+  (highlight-lines-matching-regexp "pdb.set_trace()"))
+
+(add-hook 'python-mode-hook 'annotate-pdb)
+(put 'upcase-region 'disabled nil)
+
+;; function to toggle Python breakpoint
+(defun toggle-breakpoint()
+  "Set/unset Python breakpoint on the current line"
+  (interactive)
+  (goto-char (line-beginning-position))
+  (if (string-match "set_trace" (thing-at-point 'line))
+      (progn
+       (kill-line)
+       (kill-line))
+    (open-line 1)
+    (insert "import ipdb; ipdb.set_trace()")
+    (indent-for-tab-command))
+  )
