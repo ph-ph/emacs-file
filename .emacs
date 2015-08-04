@@ -11,7 +11,6 @@
 (global-set-key [f5] 'revert-buffer)
 (global-set-key (kbd "C-x C-b") 'buffer-menu)
 (global-set-key (kbd "C-c l") 'org-store-link)
-(global-set-key (kbd "M-r") 'rgrep)
 
 ; Move all backup files to one folder
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
@@ -333,3 +332,33 @@ See `python-check-command' for the default."
 
 ;; smartparens - because closing parentheses is too hard
 (smartparens-global-mode t)
+
+;; ag search
+(setq ag-reuse-buffers t)
+(setq ag-highlight-search t)
+(defun ag-project-files-regexp (string file-type)
+  "Search using ag for a given search STRING,
+limited to files that match FILE-TYPE. STRING defaults to the
+symbol under point.
+The only difference from ag-project-files is that it treats the string
+as regex.
+
+If called with a prefix, prompts for flags to pass to ag."
+  (interactive (list (ag/read-from-minibuffer "Search string")
+                     (ag/read-file-type)))
+  (apply 'ag/search string (ag/project-root default-directory) :regexp t file-type))
+
+(defun ag-files-regexp (string file-type directory)
+  "Search using ag in a given DIRECTORY for a given search STRING,
+limited to files that match FILE-TYPE. STRING defaults to
+the symbol under point.
+The only difference from ag-files is that it treats the string
+as regex.
+
+If called with a prefix, prompts for flags to pass to ag."
+  (interactive (list (ag/read-from-minibuffer "Search string")
+                     (ag/read-file-type)
+                     (read-directory-name "Directory: ")))
+  (apply #'ag/search string directory :regexp t file-type))
+
+(global-set-key (kbd "M-r") 'ag-project-files-regexp)
