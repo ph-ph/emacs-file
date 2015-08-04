@@ -330,3 +330,6 @@ See `python-check-command' for the default."
 
 (setq enh-ruby-bounce-deep-indent t)
 (setq enh-ruby-hanging-brace-indent-level 2)
+
+;; smartparens - because closing parentheses is too hard
+(smartparens-global-mode t)
