@@ -228,7 +228,8 @@ See `python-check-command' for the default."
                          "*Python check*"))))
 
 (add-hook 'python-mode-hook '(lambda ()
-			    (local-set-key "\C-c\C-v" 'my-python-check)))
+                               (local-set-key "\C-c\C-v" 'my-python-check)
+                               (local-set-key "\C-c\C-b" 'toggle-breakpoint)))
 
 ;; Markdown mode - enable by default on vamo docs
 (autoload 'markdown-mode "markdown-mode"
@@ -291,3 +292,12 @@ See `python-check-command' for the default."
     (insert "import ipdb; ipdb.set_trace()")
     (indent-for-tab-command))
   )
+
+;; function to close bury other window
+(defun hide-opposite-window()
+  (interactive)
+  (save-excursion
+    (other-window 1)
+    (quit-window)))
+
+(global-set-key (kbd "C-c q") 'hide-opposite-window)
