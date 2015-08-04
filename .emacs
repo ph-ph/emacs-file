@@ -362,3 +362,17 @@ If called with a prefix, prompts for flags to pass to ag."
   (apply #'ag/search string directory :regexp t file-type))
 
 (global-set-key (kbd "M-r") 'ag-project-files-regexp)
+
+;; Projectile, to make working with projects easier
+(projectile-global-mode)
+(setq prjectile-enable-caching t)
+(require 'grizzl)
+(setq projectile-completion-system 'grizzl)
+;; including flx-ido per Projectile docs suggestions
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
