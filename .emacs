@@ -304,3 +304,8 @@ See `python-check-command' for the default."
 
 ;; enable groovy mode for gradle config files
 (add-to-list 'auto-mode-alist '("*.gradle" . groovy-mode))
+
+;; icicles - package that is supposed to improve autocomplete by a lot
+;; documentation: http://www.emacswiki.org/emacs/Icicles
+;; Well, maybe not a by a lot - it's really complicated.
+;; (require 'icicles)
