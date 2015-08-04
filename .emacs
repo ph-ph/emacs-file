@@ -301,3 +301,6 @@ See `python-check-command' for the default."
     (quit-window)))
 
 (global-set-key (kbd "C-c q") 'hide-opposite-window)
+
+;; enable groovy mode for gradle config files
+(add-to-list 'auto-mode-alist '("*.gradle" . groovy-mode))
