@@ -317,3 +317,16 @@ See `python-check-command' for the default."
  (add-to-list 'ac-modes 'enh-ruby-mode)
  (add-to-list 'ac-modes 'ruby-mode)
  (add-to-list 'ac-modes 'web-mode)
+
+;; enhanced ruby mode
+(add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.rake$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Rakefile$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.gemspec$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("\\.ru$" . enh-ruby-mode))
+(add-to-list 'auto-mode-alist '("Gemfile$" . enh-ruby-mode))
+
+(add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
+
+(setq enh-ruby-bounce-deep-indent t)
+(setq enh-ruby-hanging-brace-indent-level 2)
