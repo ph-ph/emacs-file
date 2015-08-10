@@ -179,12 +179,14 @@
  '(column-number-mode t)
  '(custom-enabled-themes (quote (tango-dark)))
  '(git-commit-fill-column 255)
+ '(icicle-mode nil)
  '(ido-enable-flex-matching t)
  '(python-check-command
    "pylint  --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\"")
  '(scss-compile-at-save nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
+ '(tooltip-mode nil)
  '(web-mode-code-indent-offset 4)
  '(web-mode-markup-indent-offset 4))
 (custom-set-faces
@@ -192,7 +194,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(column-marker-1 ((t (:background "disabledControlTextColor")))))
+ '(column-marker-1 ((t (:background "disabledControlTextColor"))))
+ '(sp-pair-overlay-face ((t (:background "selectedTextBackgroundColor" :foreground "selectedTextColor")))))
 
 ;; Magit - better git
 (require 'magit)
@@ -311,11 +314,16 @@ See `python-check-command' for the default."
 
 ;; autocomplete package: display completions where they should be
 (require 'auto-complete-config)
- (ac-config-default)
- (setq ac-ignore-case nil)
- (add-to-list 'ac-modes 'enh-ruby-mode)
- (add-to-list 'ac-modes 'ruby-mode)
- (add-to-list 'ac-modes 'web-mode)
+(ac-config-default)
+(setq ac-ignore-case nil)
+(add-to-list 'ac-modes 'enh-ruby-mode)
+(add-to-list 'ac-modes 'ruby-mode)
+(add-to-list 'ac-modes 'web-mode)
+;; add custom sources for autocomplete
+(setq web-mode-ac-sources-alist
+  '(("css" . (ac-source-css-property))
+    ("html" . (ac-source-words-in-buffer ac-source-abbrev))
+    ("django" . (ac-source-words-in-buffer))))
 
 ;; enhanced ruby mode
 (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
@@ -331,7 +339,27 @@ See `python-check-command' for the default."
 (setq enh-ruby-hanging-brace-indent-level 2)
 
 ;; smartparens - because closing parentheses is too hard
+(require 'smartparens-config)
+(require 'smartparens-ruby)
+(require 'smartparens-html)
 (smartparens-global-mode t)
+(show-smartparens-global-mode t)
+(sp-with-modes '(rhtml-mode web-mode)
+  (sp-local-pair "<" ">")
+  (sp-local-pair "<%" "%>")
+  (sp-local-pair "{% " " %}")
+  (sp-local-pair "{{ " " }}"))
+
+;; making sure web mode doesn't conflict with smartparens
+(defun my-web-mode-hook ()
+  (setq web-mode-enable-auto-pairing nil))
+(add-hook 'web-mode-hook  'my-web-mode-hook)
+(defun sp-web-mode-is-code-context (id action context)
+  (when (and (eq action 'insert)
+             (not (or (get-text-property (point) 'part-side)
+                      (get-text-property (point) 'block-side))))
+    t))
+(sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
 
 ;; ag search
 (setq ag-reuse-buffers t)
