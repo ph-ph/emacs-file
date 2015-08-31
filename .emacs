@@ -362,6 +362,7 @@ See `python-check-command' for the default."
 (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
 
 ;; ag search
+(require 'ag)
 (setq ag-reuse-buffers t)
 (setq ag-highlight-search t)
 (defun ag-project-files-regexp (string file-type)
