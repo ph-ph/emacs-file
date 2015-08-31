@@ -203,9 +203,14 @@
 
 ;; Jinja2 mode
 (require 'web-mode)
-(add-to-list 'auto-mode-alist '("/vamo/templates/" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
 (add-to-list 'auto-mode-alist '("/vamo/blueprints/content_editor/templates/" . web-mode))
-(setq web-mode-engines-alist '(("jinja2" . "\\.html\\'")) )
+(setq web-mode-engines-alist '(("jinja" . "/vamo/templates/.*\\.html$")) )
+(add-to-list 'web-mode-engines-alist '("jinja" . "/vamo/blueprints/content_editor/templates/.*\\.html$"))
+
+;; Web mode for all erb files
+(add-to-list 'auto-mode-alist '("\\.erb$" . web-mode))
+(add-to-list 'web-mode-engines-alist '("erb" . "\\.erb$"))
 
 (defun my-python-check (command)
   "Check a Python file (default current buffer's file).
