@@ -146,8 +146,9 @@
 
 ;; Configure column marker to be displayed in js mode
 (require 'column-marker)
-(add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 80)))
-
+(add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 100)))
+;; Same thing in ruby mode
+(add-hook 'enh-ruby-mode-hook (lambda () (interactive) (column-marker-1 100)))
 
 ;; Pymacs craziness
 ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python2.7")
@@ -187,8 +188,8 @@
  '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
- '(web-mode-code-indent-offset 4)
- '(web-mode-markup-indent-offset 4))
+ '(web-mode-code-indent-offset 2)
+ '(web-mode-markup-indent-offset 2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -200,6 +201,7 @@
 ;; Magit - better git
 (require 'magit)
 (global-set-key (kbd "C-x m") 'magit-status)
+(setq git-commit-summary-max-length 100)
 
 ;; Jinja2 mode
 (require 'web-mode)
@@ -211,6 +213,14 @@
 ;; Web mode for all erb files
 (add-to-list 'auto-mode-alist '("\\.erb$" . web-mode))
 (add-to-list 'web-mode-engines-alist '("erb" . "\\.erb$"))
+
+;; Web mode for jsx files
+(add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
+(defadvice web-mode-highlight-part (around tweak-jsx activate)
+  (if (equal web-mode-content-type "jsx")
+      (let ((web-mode-enable-part-face nil))
+        ad-do-it)
+    ad-do-it))
 
 (defun my-python-check (command)
   "Check a Python file (default current buffer's file).
