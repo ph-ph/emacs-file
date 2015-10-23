@@ -101,6 +101,8 @@
 			    (local-set-key "\C-c\C-c" 'js-send-buffer-and-go)
 			    (local-set-key "\C-cl" 'js-load-file-and-go)
 			    ))
+;; change js indent to 2
+(setq js-indent-level 2)
 
 ;;(add-to-list 'grep-find-ignored-directories "lib/layouts/*")
 
@@ -182,6 +184,8 @@
  '(git-commit-fill-column 255)
  '(icicle-mode nil)
  '(ido-enable-flex-matching t)
+ '(magit-revert-buffers nil)
+ '(projectile-tags-command "ripper-tags -R -f \"%s\" %s")
  '(python-check-command
    "pylint  --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\"")
  '(scss-compile-at-save nil)
@@ -338,7 +342,8 @@ See `python-check-command' for the default."
 (setq web-mode-ac-sources-alist
   '(("css" . (ac-source-css-property))
     ("html" . (ac-source-words-in-buffer ac-source-abbrev))
-    ("django" . (ac-source-words-in-buffer))))
+    ("django" . (ac-source-words-in-buffer))
+    ("jsx" . (ac-source-words-in-buffer))))
 
 ;; enhanced ruby mode
 (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
@@ -409,9 +414,38 @@ If called with a prefix, prompts for flags to pass to ag."
 
 ;; Projectile, to make working with projects easier
 (projectile-global-mode)
-(setq prjectile-enable-caching t)
+(setq projectile-enable-caching t)
 (require 'grizzl)
 (setq projectile-completion-system 'grizzl)
+
+;; Override projectile-regenerate-tags so that it doesn't expand file name
+(defun my-projectile-regenerate-tags ()
+  "Regenerate the project's [e|g]tags."
+  (interactive)
+  (message "Running my command")
+  (if (boundp 'ggtags-mode)
+      (progn
+        (let* ((ggtags-project-root (projectile-project-root))
+               (default-directory ggtags-project-root))
+          (ggtags-ensure-project)
+          (ggtags-update-tags t)))
+    (let* ((project-root (projectile-project-root))
+           (tags-exclude (projectile-tags-exclude-patterns))
+           (default-directory project-root)
+           ;;; (tags-file (expand-file-name projectile-tags-file-name))
+           (tags-file projectile-tags-file-name)
+           (command (format projectile-tags-command tags-file tags-exclude))
+           shell-output exit-code)
+      (with-temp-buffer
+        (setq exit-code
+              (call-process-shell-command command nil (current-buffer))
+              shell-output (projectile-trim-string
+                            (buffer-substring (point-min) (point-max)))))
+      (unless (zerop exit-code)
+        (error shell-output))
+      (visit-tags-table tags-file))))
+(define-key projectile-mode-map (kbd "C-c p R") 'my-projectile-regenerate-tags)
+
 ;; including flx-ido per Projectile docs suggestions
 (require 'flx-ido)
 (ido-mode 1)
@@ -420,3 +454,27 @@ If called with a prefix, prompts for flags to pass to ag."
 ;; disable ido faces to see flx highlights.
 (setq ido-enable-flex-matching t)
 (setq ido-use-faces nil)
+
+;; use sql-mode for hive files
+(add-to-list 'auto-mode-alist '("\.hql$" . sql-mode))
+(put 'downcase-region 'disabled nil)
+
+;; Function to find non-ascii characters in the current buffer
+(defun find-first-non-ascii-char ()
+  "Find the first non-ascii character from point onwards."
+  (interactive)
+  (let (point)
+    (save-excursion
+      (setq point
+            (catch 'non-ascii
+              (while (not (eobp))
+                (or (eq (char-charset (following-char))
+                        'ascii)
+                    (throw 'non-ascii (point)))
+                (forward-char 1)))))
+    (if point
+        (goto-char point)
+        (message "No non-ascii characters."))))
+
+(global-set-key (kbd "C-c g") 'find-tag)
+(global-set-key (kbd "C-c u") 'pop-tag-mark)
