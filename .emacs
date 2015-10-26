@@ -482,5 +482,3 @@ If called with a prefix, prompts for flags to pass to ag."
 ;; neotree - folder tree panel
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
-;; bind neotree root change to projectile project change
-(setq projectile-switch-project-action 'neotree-projectile-action)
