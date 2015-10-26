@@ -478,3 +478,9 @@ If called with a prefix, prompts for flags to pass to ag."
 
 (global-set-key (kbd "C-c g") 'find-tag)
 (global-set-key (kbd "C-c u") 'pop-tag-mark)
+
+;; neotree - folder tree panel
+(require 'neotree)
+(global-set-key [f8] 'neotree-toggle)
+;; bind neotree root change to projectile project change
+(setq projectile-switch-project-action 'neotree-projectile-action)
