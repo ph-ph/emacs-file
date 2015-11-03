@@ -189,6 +189,8 @@
  '(icicle-mode nil)
  '(ido-enable-flex-matching t)
  '(magit-revert-buffers nil)
+ '(org-babel-load-languages (quote ((ruby . t) (emacs-lisp . t))))
+ '(org-src-fontify-natively t)
  '(projectile-tags-command "ripper-tags -R -f \"%s\" %s")
  '(python-check-command
    "pylint  --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\"")
