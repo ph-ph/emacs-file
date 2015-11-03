@@ -424,34 +424,6 @@ If called with a prefix, prompts for flags to pass to ag."
 (require 'grizzl)
 (setq projectile-completion-system 'grizzl)
 
-;; Override projectile-regenerate-tags so that it doesn't expand file name
-(defun my-projectile-regenerate-tags ()
-  "Regenerate the project's [e|g]tags."
-  (interactive)
-  (message "Running my command")
-  (if (boundp 'ggtags-mode)
-      (progn
-        (let* ((ggtags-project-root (projectile-project-root))
-               (default-directory ggtags-project-root))
-          (ggtags-ensure-project)
-          (ggtags-update-tags t)))
-    (let* ((project-root (projectile-project-root))
-           (tags-exclude (projectile-tags-exclude-patterns))
-           (default-directory project-root)
-           ;;; (tags-file (expand-file-name projectile-tags-file-name))
-           (tags-file projectile-tags-file-name)
-           (command (format projectile-tags-command tags-file tags-exclude))
-           shell-output exit-code)
-      (with-temp-buffer
-        (setq exit-code
-              (call-process-shell-command command nil (current-buffer))
-              shell-output (projectile-trim-string
-                            (buffer-substring (point-min) (point-max)))))
-      (unless (zerop exit-code)
-        (error shell-output))
-      (visit-tags-table tags-file))))
-(define-key projectile-mode-map (kbd "C-c p R") 'my-projectile-regenerate-tags)
-
 ;; including flx-ido per Projectile docs suggestions
 (require 'flx-ido)
 (ido-mode 1)
