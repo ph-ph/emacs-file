@@ -100,6 +100,10 @@
 			    (local-set-key "\C-cc" 'js-send-buffer)
 			    (local-set-key "\C-c\C-c" 'js-send-buffer-and-go)
 			    (local-set-key "\C-cl" 'js-load-file-and-go)
+                (setq comment-style 'extra-line)
+                (setq comment-start "/**")
+                (setq comment-continue " *")
+                (setq comment-end "*/")
 			    ))
 ;; change js indent to 2
 (setq js-indent-level 2)
