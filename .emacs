@@ -460,3 +460,27 @@ If called with a prefix, prompts for flags to pass to ag."
 ;; neotree - folder tree panel
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
+
+;; Linter command for javascript files
+(defun airbnb-js-lint ()
+  "Check a Javascript/React file (default current buffer's file)."
+  (interactive
+   ;; Generate linter command
+   (let ((linter-command
+          (concat
+           (projectile-project-root)
+           "node_modules/.bin/eslint --ext .js,.jsx --format compact --reset "
+           (buffer-file-name)
+           " | sed -E 's/(.*): line ([0-9]+), col [0-9]+, (.*)/\\1:\\2: \\3/'")))
+
+     (compilation-start linter-command nil
+                       (lambda (_modename)
+                         "*JS lint*")))
+   )
+  )
+
+(defun airbnb-js-lint-keybinding ()
+  (local-set-key "\C-c\C-v" 'airbnb-js-lint))
+(add-hook 'web-mode-hook 'airbnb-js-lint-keybinding)
+(add-hook 'js-mode-hook 'airbnb-js-lint-keybinding)
+;; ========== End of linter stuff
