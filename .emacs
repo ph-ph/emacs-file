@@ -470,10 +470,13 @@ If called with a prefix, prompts for flags to pass to ag."
   "Check a Javascript/React file (default current buffer's file)."
   (interactive
    ;; Generate linter command
-   (let ((linter-command
+   (let (
+         (linter-command
           (concat
            (projectile-project-root)
-           "node_modules/.bin/eslint --ext .js,.jsx --format compact --reset "
+           "node_modules/.bin/eslint --ext .js,.jsx --ignore-path="
+           (concat (projectile-project-root) ".eslintignore")
+           " --format compact "
            (buffer-file-name)
            " | sed -E 's/(.*): line ([0-9]+), col [0-9]+, (.*)/\\1:\\2: \\3/'")))
 
