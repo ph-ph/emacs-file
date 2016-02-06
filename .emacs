@@ -262,6 +262,7 @@ See `python-check-command' for the default."
                                (local-set-key "\C-c\C-b" 'toggle-breakpoint)))
 
 ;; Markdown mode - enable by default on vamo docs
+(require 'markdown-mode)
 (autoload 'markdown-mode "markdown-mode"
    "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("/vamo/docs/" . markdown-mode))
