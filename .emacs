@@ -99,7 +99,7 @@
 			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
 			    (local-set-key "\C-cc" 'js-send-buffer)
 			    (local-set-key "\C-c\C-c" 'js-send-buffer-and-go)
-			    (local-set-key "\C-cl" 'js-load-file-and-go)
+                (local-set-key "\C-cl" 'org-store-link)
                 (setq comment-style 'extra-line)
                 (setq comment-start "/**")
                 (setq comment-continue " *")
