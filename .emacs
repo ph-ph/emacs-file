@@ -213,6 +213,8 @@
 (require 'magit)
 (global-set-key (kbd "C-x m") 'magit-status)
 (setq git-commit-summary-max-length 100)
+(remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
+(remove-hook 'magit-refs-sections-hook 'magit-insert-remote-branches)
 
 ;; Jinja2 mode
 (require 'web-mode)
