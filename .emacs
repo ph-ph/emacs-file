@@ -492,13 +492,36 @@ If called with a prefix, prompts for flags to pass to ag."
 (add-hook 'js-mode-hook 'airbnb-js-lint-keybinding)
 ;; ========== End of linter stuff
 
+;; Linter command for ruby files
+(defun airbnb-ruby-lint ()
+  "Check a Ruby file (default current buffer's file)."
+  (interactive
+   ;; Generate linter command
+   (let (
+         (linter-command
+          (concat
+           "pushd "
+           (projectile-project-root)
+           "; script/rubocop.sh -f "
+           (buffer-file-name)
+           ";popd"
+           )))
+
+     (compilation-start linter-command nil
+                       (lambda (_modename)
+                         "*Rubocop*")))
+   )
+  )
+(add-hook 'enh-ruby-mode-hook (lambda () (local-set-key "\C-c\C-v" 'airbnb-ruby-lint)))
+;; ======== End of ruby linter stuff
+
 ;; Remote pry debugger
 ;; Taken from http://emacs.stackexchange.com/questions/3537/how-do-you-run-pry-from-emacs
 (defun my-run-remote-pry ()
   (interactive)
   (setenv "VAGRANT_CWD" "/Users/dzmitry_kishylau/airlab")
-  (let ((buffer (apply 'make-comint "pry-remote" "vagrant" nil '("ssh" "-c" "cd ~/repos/airbnb && bundle exec pry-remote"))))
+  (let ((buffer (apply 'make-comint "pry-remote" "vagrant" nil '("ssh" "-c" "export INSIDE_EMACS=true && cd ~/repos/airbnb && bundle exec pry-remote"))))
     (switch-to-buffer buffer)
     (setq-local comint-process-echoes t)))
 
-(add-hook 'enh-ruby-mode-hook (lambda () (local-set-key "\C-c r d" 'my-run-remote-pry)))
+(global-set-key (kbd "C-c r d") 'my-run-remote-pry)
