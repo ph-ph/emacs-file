@@ -184,6 +184,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(css-indent-offset 2)
  '(custom-enabled-themes (quote (tango-dark)))
  '(git-commit-fill-column 255)
  '(icicle-mode nil)
