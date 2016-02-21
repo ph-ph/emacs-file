@@ -502,8 +502,8 @@ If called with a prefix, prompts for flags to pass to ag."
           (concat
            "pushd "
            (projectile-project-root)
-           "; script/rubocop.sh -f "
-           (buffer-file-name)
+           "; script/rubocop.sh "
+           (if current-prefix-arg "" (concat "-f " (buffer-file-name)))
            ";popd"
            )))
 
