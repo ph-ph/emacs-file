@@ -527,3 +527,118 @@ If called with a prefix, prompts for flags to pass to ag."
     (setq-local comint-process-echoes t)))
 
 (global-set-key (kbd "C-c r d") 'my-run-remote-pry)
+
+;; Add a way to browse files on GHE
+(require 'browse-at-remote)
+
+(defun browse-at-remote/browse ()
+  "Browse the current file with `browse-url'."
+  (interactive)
+  (message "inside browse")
+  (browse-url (browse-at-remote/get-url)))
+
+(defun browse-at-remote/get-url ()
+  "Main method, returns URL to browse."
+
+  (message "inside get-url")
+  (cond
+   ;; dired-mode
+   ((eq major-mode 'dired-mode)
+    (browse-at-remote/file-url (dired-current-directory)))
+
+   ;; magit-status-mode
+   ((eq major-mode 'magit-status-mode)
+    (browse-at-remote/file-url default-directory))
+
+   ;; magit-log-mode
+   ((or (eq major-mode 'magit-log-mode) (eq major-mode 'vc-annotate-mode))
+    (browse-at-remote/commit-url
+     (save-excursion
+       (save-restriction
+         (widen)
+         (goto-char ( line-beginning-position))
+         (search-forward " ")
+         (buffer-substring-no-properties (line-beginning-position) (- (point) 1))))))
+
+   ;; magit-commit-mode
+   ((eq major-mode 'magit-commit-mode)
+    (save-excursion
+      (goto-char (point-min))
+      (let* ((first-line
+              (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+             (commithash (car (s-split " " first-line))))
+        (browse-at-remote/commit-url commithash))))
+
+   ;; We're inside of file-attached buffer with active region
+   ((and buffer-file-name (use-region-p))
+    (let ((point-begin (min (region-beginning) (region-end)))
+          (point-end (max (region-beginning) (region-end))))
+      (message "inside file-attached buffer")
+      (browse-at-remote/file-url
+       buffer-file-name point-begin
+       (if (eq (char-before point-end) ?\n) (- point-end 1) point-end))))
+
+   ;; We're inside of file-attached buffer without region
+   (buffer-file-name
+    (browse-at-remote/file-url (buffer-file-name) (point)))
+
+   (t (error "Sorry, I'm not sure what to do with this."))))
+
+(defun browse-at-remote/file-url (filename &optional start end)
+  "Return the URL to browse FILENAME from lines START to END. "
+  (let* ((remote-ref (browse-at-remote/remote-ref filename))
+         (remote (car remote-ref))
+         (ref (cdr remote-ref))
+         (relname (f-relative filename (f-expand (vc-git-root filename))))
+         (target-repo (browse-at-remote/get-url-from-remote remote))
+         (remote-type (browse-at-remote/get-remote-type target-repo))
+         (repo-url (cdr target-repo))
+         (url-formatter (browse-at-remote/get-formatter 'region-url remote-type))
+         (start-line (when start (line-number-at-pos start)))
+         (end-line (when end (line-number-at-pos end))))
+    (message "after let block")
+    (unless url-formatter
+      (error (format "Origin repo parsing failed: %s" repo-url)))
+
+    (funcall url-formatter repo-url ref relname
+             (if start-line start-line)
+             (if (and end-line (not (equal start-line end-line))) end-line))))
+
+(defun browse-at-remote/remote-ref (&optional filename)
+  "Return the remote & commit ref which FILENAME is in.
+
+Returns (REMOTE-URL . REF) or nil, if the local branch doesn't track a remote."
+  ;; Check if current state is not detached and tracks remote branch
+  (message "inside remote-ref")
+  (setq local-branch
+	(if (fboundp 'vc-git--symbolic-ref)
+	    (vc-git--symbolic-ref (or filename "."))
+	  (vc-git-working-revision (or filename "."))))
+
+  (let* ((remote (and local-branch (browse-at-remote/get-from-config
+                                    (format "branch.%s.remote" local-branch))))
+         (remote (when remote (browse-at-remote/get-remote-url remote)))
+         (remote-branch
+          (s-chop-prefix "refs/heads/"
+                         (and local-branch (browse-at-remote/get-from-config
+                                            (format "branch.%s.merge" local-branch))))))
+    (message "remote 1:")
+    (message (and local-branch (browse-at-remote/get-from-config
+                                (format "branch.%s.remote" local-branch))))
+    (message "remote 2:")
+    (message (browse-at-remote/get-remote-url remote))
+    (message "remote-branch:")
+    (message remote-branch)
+    (unless (and (string= remote "")
+                 (string= remote-branch ""))
+      (cons remote
+            (if (not browse-at-remote/prefer-symbolic)
+                (vc-git--rev-parse "HEAD")
+              remote-branch)))))
+
+(defun browse-at-remote/get-from-config (key)
+  (message "get-from-config")
+  (message key)
+  (with-temp-buffer
+    (vc-git--call t "config" "--get" key)
+    (s-trim (buffer-string))))
