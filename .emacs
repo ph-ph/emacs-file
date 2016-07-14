@@ -186,6 +186,8 @@
  '(column-number-mode t)
  '(css-indent-offset 2)
  '(custom-enabled-themes (quote (tango-dark)))
+ '(desktop-auto-save-timeout 30)
+ '(desktop-save-mode t)
  '(git-commit-fill-column 255)
  '(icicle-mode nil)
  '(ido-enable-flex-matching t)
