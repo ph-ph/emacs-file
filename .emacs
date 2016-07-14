@@ -288,14 +288,14 @@ See `python-check-command' for the default."
    "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
 
 ;; Custom command to run ipython with vamo venv
-(defun run-vamo-ipython ()
+(defun run-cs231-ipython ()
   (interactive)
   (let (old-buffer-name python-shell-buffer-name)
     (setq python-shell-buffer-name "Python")
-    (run-python "bash -c \"source ~/.bash_profile && workon vamo && cd /Users/dzmitry/src/vamo && foreman run ipython --profile vamo\"" nil t)
+    (run-python "bash -c \"source ~/.bash_profile && workon cs231n && cd /Users/dzmitry_kishylau/Dropbox/src/cs231n && frameworkpython -m IPython\"" nil t)
     (setq python-shell-buffer-name old-buffer-name))
   )
-(global-set-key (kbd "C-x r p") 'run-vamo-ipython)
+(global-set-key (kbd "C-x r p") 'run-cs231-ipython)
 
 ;; mode for editing scss files
 (require 'scss-mode)
