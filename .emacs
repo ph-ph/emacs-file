@@ -431,13 +431,13 @@ If called with a prefix, prompts for flags to pass to ag."
 (setq projectile-completion-system 'grizzl)
 
 ;; including flx-ido per Projectile docs suggestions
-(require 'flx-ido)
-(ido-mode 1)
-(ido-everywhere 1)
-(flx-ido-mode 1)
-;; disable ido faces to see flx highlights.
-(setq ido-enable-flex-matching t)
-(setq ido-use-faces nil)
+;; (require 'flx-ido)
+;; (ido-mode 1)
+;; (ido-everywhere 1)
+;; (flx-ido-mode 1)
+;; ;; disable ido faces to see flx highlights.
+;; (setq ido-enable-flex-matching t)
+;; (setq ido-use-faces nil)
 
 ;; use sql-mode for hive files
 (add-to-list 'auto-mode-alist '("\.hql$" . sql-mode))
