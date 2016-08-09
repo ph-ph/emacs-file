@@ -237,6 +237,9 @@
         ad-do-it)
     ad-do-it))
 
+;; Web mode for hbs files
+(add-to-list 'auto-mode-alist '("\\.hbs$" . web-mode))
+
 (defun my-python-check (command)
   "Check a Python file (default current buffer's file).
 Runs COMMAND, a shell command, as if by `compile'.
