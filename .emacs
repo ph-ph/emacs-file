@@ -507,8 +507,8 @@ If called with a prefix, prompts for flags to pass to ag."
           (concat
            "pushd "
            (projectile-project-root)
-           "; BUNDLE_IGNORE_CONFIG=1 script/rubocop.sh "
-           (if current-prefix-arg "" (concat "-f " (buffer-file-name)))
+           "; rubocop --config ./.rubocop.yml "
+           (buffer-file-name)
            ";popd"
            )))
 
@@ -570,7 +570,7 @@ If called with a prefix, prompts for flags to pass to ag."
          (remote (browse-at-remote--get-remote-url "origin"))
          (ref "master")
          (target-repo (browse-at-remote--get-url-from-remote remote))
-         (remote-type (browse-at-remote--get-remote-type target-repo))
+         (remote-type "github")
          (repo-url (cdr target-repo))
          (url-formatter (browse-at-remote--get-formatter 'region-url remote-type))
          (start-line (when start (line-number-at-pos start)))
