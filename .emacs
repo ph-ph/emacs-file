@@ -44,22 +44,6 @@
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize))
 
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/scala-emacs")
-;; (require 'scala-mode-auto)
-
-;; (add-hook 'scala-mode-hook
-;;             '(lambda ()
-;; 	       (scala-mode-feature-electric-mode)
-;;                ))
-
-;; (require 'scala-mode)
-;; (add-to-list 'auto-mode-alist '("\\.scala$" . scala-mode))
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/ensime/src/main/elisp/")
-;; (require 'ensime)
-;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
-(require 'ido)
-(ido-mode t)
-(add-to-list 'auto-mode-alist '("Rakefile$" . ruby-mode))
 (require 'inf-ruby)
 
 ; Install mode-compile to give friendlier compiling support!
@@ -189,7 +173,6 @@
  '(desktop-auto-save-timeout 30)
  '(desktop-save-mode t)
  '(git-commit-fill-column 255)
- '(icicle-mode nil)
  '(ido-enable-flex-matching t)
  '(magit-revert-buffers nil)
  '(org-babel-load-languages (quote ((ruby . t) (emacs-lisp . t))))
@@ -351,7 +334,6 @@ See `python-check-command' for the default."
 (ac-config-default)
 (setq ac-ignore-case nil)
 (add-to-list 'ac-modes 'enh-ruby-mode)
-(add-to-list 'ac-modes 'ruby-mode)
 (add-to-list 'ac-modes 'web-mode)
 ;; add custom sources for autocomplete
 (setq web-mode-ac-sources-alist
@@ -426,21 +408,6 @@ If called with a prefix, prompts for flags to pass to ag."
   (apply #'ag/search string directory :regexp t file-type))
 
 (global-set-key (kbd "M-r") 'ag-project-files-regexp)
-
-;; Projectile, to make working with projects easier
-(projectile-global-mode)
-(setq projectile-enable-caching t)
-(require 'grizzl)
-(setq projectile-completion-system 'grizzl)
-
-;; including flx-ido per Projectile docs suggestions
-;; (require 'flx-ido)
-;; (ido-mode 1)
-;; (ido-everywhere 1)
-;; (flx-ido-mode 1)
-;; ;; disable ido faces to see flx highlights.
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-use-faces nil)
 
 ;; use sql-mode for hive files
 (add-to-list 'auto-mode-alist '("\.hql$" . sql-mode))
@@ -580,3 +547,27 @@ If called with a prefix, prompts for flags to pass to ag."
     (funcall url-formatter repo-url ref relname
              (if start-line start-line)
              (if (and end-line (not (equal start-line end-line))) end-line))))
+
+;; =============================================================================
+;; Projectile, ido etc, all in one place
+(ido-mode t)
+
+(require 'ido-vertical-mode)
+(ido-vertical-mode 1)
+(setq ido-vertical-define-keys 'C-n-and-C-p-only)
+
+(require 'flx-ido)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-use-faces nil)
+
+;; Projectile, to make working with projects easier
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+
+;; grizzl turned out to be fairly bad for monorail
+;; (require 'grizzl)
+;; (setq projectile-completion-system 'grizzl)
+
+;; End of projectile stuff =====================================================
