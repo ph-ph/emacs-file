@@ -174,7 +174,7 @@
  '(desktop-save-mode t)
  '(git-commit-fill-column 255)
  '(ido-enable-flex-matching t)
- '(magit-revert-buffers nil)
+ '(magit-revert-buffers nil t)
  '(org-babel-load-languages (quote ((ruby . t) (emacs-lisp . t))))
  '(org-src-fontify-natively t)
  '(projectile-tags-command "ripper-tags -R -f \"%s\" %s")
@@ -184,6 +184,7 @@
  '(show-paren-mode t)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
+ '(web-mode-attr-indent-offset 2)
  '(web-mode-code-indent-offset 2)
  '(web-mode-markup-indent-offset 2))
 (custom-set-faces
