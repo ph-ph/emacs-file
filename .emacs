@@ -5,6 +5,8 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4) ; set tab width to 4 for all buffers
 
+(setq tramp-ssh-controlmaster-options "")
+
 (global-auto-revert-mode t)
 
 (setq-default org-startup-truncated nil)
@@ -175,6 +177,9 @@
  '(git-commit-fill-column 255)
  '(ido-enable-flex-matching t)
  '(magit-revert-buffers nil t)
+ '(magit-status-headers-hook
+   (quote
+    (magit-insert-error-header magit-insert-diff-filter-header magit-insert-head-branch-header magit-insert-upstream-branch-header magit-insert-push-branch-header)))
  '(org-babel-load-languages (quote ((ruby . t) (emacs-lisp . t))))
  '(org-src-fontify-natively t)
  '(projectile-tags-command "ripper-tags -R -f \"%s\" %s")
@@ -201,6 +206,7 @@
 (setq git-commit-summary-max-length 100)
 (remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
 (remove-hook 'magit-refs-sections-hook 'magit-insert-remote-branches)
+(setq magit-refresh-verbose t)
 
 ;; Jinja2 mode
 (require 'web-mode)
