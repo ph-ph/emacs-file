@@ -139,6 +139,7 @@
 ;; Configure column marker to be displayed in js mode
 (require 'column-marker)
 (add-hook 'js-mode-hook (lambda () (interactive) (column-marker-1 100)))
+(add-hook 'web-mode-hook (lambda () (interactive) (column-marker-1 100)))
 ;; Same thing in ruby mode
 (add-hook 'enh-ruby-mode-hook (lambda () (interactive) (column-marker-1 100)))
 
