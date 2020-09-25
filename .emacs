@@ -5,8 +5,6 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4) ; set tab width to 4 for all buffers
 
-(setq tramp-ssh-controlmaster-options "")
-
 (global-auto-revert-mode t)
 
 (setq-default org-startup-truncated nil)
@@ -19,16 +17,14 @@
   backup-by-copying t    ; Don't delink hardlinks
   version-control t      ; Use version numbers on backups
   delete-old-versions t  ; Automatically delete excess backups
-  kept-new-versions 20   ; how many of the newest versions to keep
-  kept-old-versions 5    ; and how many of the old
+  kept-new-versions 10   ; how many of the newest versions to keep
+  kept-old-versions 2    ; and how many of the old
   )
 
 ; setup package installs
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(when (< emacs-major-version 24)
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+             '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 ; Allow to edit file permissions in dired mode
@@ -39,6 +35,7 @@
 
 ; Use ssh for remote file opening
 (setq tramp-default-method "ssh")
+(setq tramp-ssh-controlmaster-options "")
 
 (add-to-list 'load-path "/Applications/Emacs.app/Contents/Resources/lisp/progmodes/")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/other/")
@@ -121,9 +118,6 @@
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
 
-;; ESS - to work with R
-(require 'ess-site)
-
 ;; Configuration for multiple cursors
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -131,10 +125,6 @@
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
-;; Configure stupid Haskell
-(setq haskell-mode-hook 'turn-on-haskell-indentation)
-(setq haskell-program-name "ghci")
 
 ;; Configure column marker to be displayed in js mode
 (require 'column-marker)
@@ -155,6 +145,8 @@
 ;;  '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
 
 ;; Install ropemacs
+;; This package is for Python refactoring and working with Python projects in general
+;; Provides things like "jump to definition etc".
 (require 'pymacs)
 (pymacs-load "ropemacs" "rope-")
 
@@ -172,20 +164,27 @@
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
  '(css-indent-offset 2)
- '(custom-enabled-themes (quote (tango-dark)))
+ '(custom-enabled-themes '(tango-dark))
  '(desktop-auto-save-timeout 30)
  '(desktop-save-mode t)
+ '(enh-ruby-add-encoding-comment-on-save nil)
+ '(enh-ruby-bounce-deep-indent t)
+ '(enh-ruby-use-encoding-map nil)
  '(git-commit-fill-column 255)
  '(ido-enable-flex-matching t)
  '(magit-revert-buffers nil t)
  '(magit-status-headers-hook
-   (quote
-    (magit-insert-error-header magit-insert-diff-filter-header magit-insert-head-branch-header magit-insert-upstream-branch-header magit-insert-push-branch-header)))
- '(org-babel-load-languages (quote ((ruby . t) (emacs-lisp . t))))
+   '(magit-insert-error-header magit-insert-diff-filter-header magit-insert-head-branch-header magit-insert-upstream-branch-header magit-insert-push-branch-header))
+ '(org-babel-load-languages '((ruby . t) (emacs-lisp . t)))
  '(org-src-fontify-natively t)
+ '(package-selected-packages
+   '(yasnippet yaml-mode web-mode undo-tree thrift smartparens scss-mode quack projectile nvm neotree multiple-cursors markdown-mode magit js-comint inf-ruby ido-vertical-mode hive grizzl git-gutter flx-ido expand-region exec-path-from-shell ess enh-ruby-mode column-marker coffee-mode browse-at-remote auto-complete ag))
  '(projectile-tags-command "ripper-tags -R -f \"%s\" %s")
  '(python-check-command
    "pylint  --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\"")
+ '(ruby-encoding-magic-comment-style 'custom)
+ '(ruby-insert-encoding-magic-comment nil)
+ '(ruby-use-encoding-map nil)
  '(scss-compile-at-save nil)
  '(show-paren-mode t)
  '(tool-bar-mode nil)
@@ -209,12 +208,13 @@
 (remove-hook 'magit-refs-sections-hook 'magit-insert-remote-branches)
 (setq magit-refresh-verbose t)
 
-;; Jinja2 mode
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html$" . web-mode))
 (add-to-list 'auto-mode-alist '("/vamo/blueprints/content_editor/templates/" . web-mode))
-(setq web-mode-engines-alist '(("jinja" . "/vamo/templates/.*\\.html$")) )
-(add-to-list 'web-mode-engines-alist '("jinja" . "/vamo/blueprints/content_editor/templates/.*\\.html$"))
+;; Configure Jinja2 mode for files in certain folders
+;; I'm not using it now, though.
+;; (setq web-mode-engines-alist '(("jinja" . "/vamo/templates/.*\\.html$")) )
+;; (add-to-list 'web-mode-engines-alist '("jinja" . "/vamo/blueprints/content_editor/templates/.*\\.html$"))
 
 ;; Web mode for all erb files
 (add-to-list 'auto-mode-alist '("\\.erb$" . web-mode))
@@ -231,6 +231,8 @@
 ;; Web mode for hbs files
 (add-to-list 'auto-mode-alist '("\\.hbs$" . web-mode))
 
+;; Custom commands for Python mode
+;; Requires pylint to be installed.
 (defun my-python-check (command)
   "Check a Python file (default current buffer's file).
 Runs COMMAND, a shell command, as if by `compile'.
@@ -257,10 +259,11 @@ See `python-check-command' for the default."
                                (local-set-key "\C-c\C-v" 'my-python-check)
                                (local-set-key "\C-c\C-b" 'toggle-breakpoint)))
 
-;; Markdown mode - enable by default on vamo docs
+;; Markdown mode
 (require 'markdown-mode)
 (autoload 'markdown-mode "markdown-mode"
-   "Major mode for editing Markdown files" t)
+  "Major mode for editing Markdown files" t)
+;; enable by default on vamo docs
 (add-to-list 'auto-mode-alist '("/vamo/docs/" . markdown-mode))
 
 ;; Undo tree mode - undo tree visualization
@@ -281,7 +284,7 @@ See `python-check-command' for the default."
    python-shell-completion-string-code
    "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
 
-;; Custom command to run ipython with vamo venv
+;; Custom command to run ipython with cs231n venv
 (defun run-cs231-ipython ()
   (interactive)
   (let (old-buffer-name python-shell-buffer-name)
@@ -289,7 +292,8 @@ See `python-check-command' for the default."
     (run-python "bash -c \"source ~/.bash_profile && workon cs231n && cd /Users/dzmitry_kishylau/Dropbox/src/cs231n && frameworkpython -m IPython\"" nil t)
     (setq python-shell-buffer-name old-buffer-name))
   )
-(global-set-key (kbd "C-x r p") 'run-cs231-ipython)
+;; I don't need that anymore, but let's keep it as an example of what can be done
+;; (global-set-key (kbd "C-x r p") 'run-cs231-ipython)
 
 ;; mode for editing scss files
 (require 'scss-mode)
@@ -331,11 +335,6 @@ See `python-check-command' for the default."
 
 ;; enable groovy mode for gradle config files
 (add-to-list 'auto-mode-alist '("*.gradle" . groovy-mode))
-
-;; icicles - package that is supposed to improve autocomplete by a lot
-;; documentation: http://www.emacswiki.org/emacs/Icicles
-;; Well, maybe not a by a lot - it's really complicated.
-;; (require 'icicles)
 
 ;; autocomplete package: display completions where they should be
 (require 'auto-complete-config)
@@ -438,12 +437,14 @@ If called with a prefix, prompts for flags to pass to ag."
         (goto-char point)
         (message "No non-ascii characters."))))
 
+;; So that we can use TAGs file more efficiently
 (global-set-key (kbd "C-c g") 'find-tag)
 (global-set-key (kbd "C-c u") 'pop-tag-mark)
 
 ;; neotree - folder tree panel
-(require 'neotree)
-(global-set-key [f8] 'neotree-toggle)
+;; I tried using it for a while, but it didn't stick
+;; (require 'neotree)
+;; (global-set-key [f8] 'neotree-toggle)
 
 ;; Linter command for javascript files
 (defun airbnb-js-lint ()
@@ -494,17 +495,6 @@ If called with a prefix, prompts for flags to pass to ag."
   )
 (add-hook 'enh-ruby-mode-hook (lambda () (local-set-key "\C-c\C-v" 'airbnb-ruby-lint)))
 ;; ======== End of ruby linter stuff
-
-;; Remote pry debugger
-;; Taken from http://emacs.stackexchange.com/questions/3537/how-do-you-run-pry-from-emacs
-(defun my-run-remote-pry ()
-  (interactive)
-  (setenv "VAGRANT_CWD" "/Users/dzmitry_kishylau/airlab")
-  (let ((buffer (apply 'make-comint "pry-remote" "vagrant" nil '("ssh" "-c" "export INSIDE_EMACS=true && cd ~/repos/airbnb && bundle exec pry-remote"))))
-    (switch-to-buffer buffer)
-    (setq-local comint-process-echoes t)))
-
-(global-set-key (kbd "C-c r d") 'my-run-remote-pry)
 
 ;; Add a way to browse files on GHE
 (require 'browse-at-remote)
@@ -574,8 +564,48 @@ If called with a prefix, prompts for flags to pass to ag."
 (projectile-global-mode)
 (setq projectile-enable-caching t)
 
-;; grizzl turned out to be fairly bad for monorail
-;; (require 'grizzl)
-;; (setq projectile-completion-system 'grizzl)
-
 ;; End of projectile stuff =====================================================
+
+;; =============================================================================
+;; Override enh-ruby function that inserts encoding header into ruby files,
+;; to match Airbnb style
+(defun enh-ruby-mode-set-encoding ()
+  (save-excursion
+    (widen)
+    (goto-char (point-min))
+    (when (re-search-forward "[^\0-\177]" nil t)
+      (goto-char (point-min))
+      (let ((coding-system
+             (or coding-system-for-write
+                 buffer-file-coding-system)))
+        (if coding-system
+            (setq coding-system
+                  (or (coding-system-get coding-system 'mime-charset)
+                      (coding-system-change-eol-conversion coding-system nil))))
+        (setq coding-system
+              (if coding-system
+                  (symbol-name
+                   (or (and enh-ruby-use-encoding-map
+                            (cdr (assq coding-system enh-ruby-encoding-map)))
+                       coding-system))
+                "ascii-8bit"))
+        (if (looking-at "^#!") (beginning-of-line 2))
+        (cond ((looking-at "\\s *#.*-\*-\\s *\\(en\\)?coding\\s *:\\s *\\([-a-z0-9_]*\\)\\s *\\(;\\|-\*-\\)")
+               (unless (string= (match-string 2) coding-system)
+                 (goto-char (match-beginning 2))
+                 (delete-region (point) (match-end 2))
+                 (and (looking-at "-\*-")
+                      (let ((n (skip-chars-backward " ")))
+                        (cond ((= n 0) (insert "  ") (backward-char))
+                              ((= n -1) (insert " "))
+                              ((forward-char)))))
+                 (insert coding-system)))
+              ((looking-at "\\s *#.*coding\\s *[:=]"))
+              (t (insert "# encoding: " coding-system "\n"))
+              )))))
+;; ==============================================================================
+
+;; Yasnippet
+;;(add-to-list 'load-path "~/emacs-file/snippets")
+(require 'yasnippet)
+(yas-global-mode 1)

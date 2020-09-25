@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: code_block
+# key: <s
+# --
+#+BEGIN_CODE $0
+$1
+#+END_CODE
