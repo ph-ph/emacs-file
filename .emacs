@@ -135,20 +135,20 @@
 
 ;; Pymacs craziness
 ;; (setenv "PYMACS_PYTHON" "/usr/local/bin/python2.7")
-(autoload 'pymacs-apply "pymacs")
-(autoload 'pymacs-call "pymacs")
-(autoload 'pymacs-eval "pymacs" nil t)
-(autoload 'pymacs-exec "pymacs" nil t)
-(autoload 'pymacs-load "pymacs" nil t)
-(autoload 'pymacs-autoload "pymacs")
+;; (autoload 'pymacs-apply "pymacs")
+;; (autoload 'pymacs-call "pymacs")
+;; (autoload 'pymacs-eval "pymacs" nil t)
+;; (autoload 'pymacs-exec "pymacs" nil t)
+;; (autoload 'pymacs-load "pymacs" nil t)
+;; (autoload 'pymacs-autoload "pymacs")
 ;;(eval-after-load "pymacs"
 ;;  '(add-to-list 'pymacs-load-path YOUR-PYMACS-DIRECTORY"))
 
 ;; Install ropemacs
 ;; This package is for Python refactoring and working with Python projects in general
 ;; Provides things like "jump to definition etc".
-(require 'pymacs)
-(pymacs-load "ropemacs" "rope-")
+;; (require 'pymacs)
+;; (pymacs-load "ropemacs" "rope-")
 
 ;; Set font size to 14pt
 (set-face-attribute 'default nil :height 160)
@@ -168,7 +168,7 @@
  '(desktop-auto-save-timeout 30)
  '(desktop-save-mode t)
  '(enh-ruby-add-encoding-comment-on-save nil)
- '(enh-ruby-bounce-deep-indent t)
+ '(enh-ruby-bounce-deep-indent t t)
  '(enh-ruby-use-encoding-map nil)
  '(git-commit-fill-column 255)
  '(ido-enable-flex-matching t)
@@ -178,7 +178,7 @@
  '(org-babel-load-languages '((ruby . t) (emacs-lisp . t)))
  '(org-src-fontify-natively t)
  '(package-selected-packages
-   '(yasnippet yaml-mode web-mode undo-tree thrift smartparens scss-mode quack projectile nvm neotree multiple-cursors markdown-mode magit js-comint inf-ruby ido-vertical-mode hive grizzl git-gutter flx-ido expand-region exec-path-from-shell ess enh-ruby-mode column-marker coffee-mode browse-at-remote auto-complete ag))
+   '(lua-mode sql-presto yasnippet yaml-mode web-mode undo-tree thrift smartparens scss-mode quack projectile nvm neotree multiple-cursors markdown-mode magit js-comint inf-ruby ido-vertical-mode hive grizzl git-gutter flx-ido expand-region exec-path-from-shell ess enh-ruby-mode column-marker coffee-mode browse-at-remote auto-complete ag))
  '(projectile-tags-command "ripper-tags -R -f \"%s\" %s")
  '(python-check-command
    "pylint  --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\"")
@@ -187,6 +187,7 @@
  '(ruby-use-encoding-map nil)
  '(scss-compile-at-save nil)
  '(show-paren-mode t)
+ '(sql-hive-options '("--emr-cluster infra-shared-prod --hive-cluster silver"))
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
  '(web-mode-attr-indent-offset 2)
@@ -606,6 +607,5 @@ If called with a prefix, prompts for flags to pass to ag."
 ;; ==============================================================================
 
 ;; Yasnippet
-;;(add-to-list 'load-path "~/emacs-file/snippets")
 (require 'yasnippet)
 (yas-global-mode 1)
